@@ -5,32 +5,33 @@
 int extraMemoryAllocation;
 
 // implement merge sort
-void merge(int arr[], int l, int m, int r)
+// extraMemoryAllocation counts bytes of extra memory allocated
+void merge(int array[], int left, int middle, int right)
 {
     int i, j, k;
-    int N1 = m - l + 1;
-    int N2 = r - m;
+    int N1 = middle - left + 1;
+    int N2 = right - middle;
 
     int L[N1], R[N2];
 
     for (i = 0; i < N1; i++)
-        L[i] = arr[l + i];
+        L[i] = array[left + i];
     for (j = 0; j < N2; j++)
-        R[j] = arr[m + 1 + j];
+        R[j] = array[middle + 1 + j];
 
     i = 0;
     j = 0;
-    k = l;
+    k = left;
     while (i < N1 && j < N2)
     {
         if (L[i] <= R[j])
         {
-            arr[k] = L[i];
+            array[k] = L[i];
             i++;
         }
         else
         {
-            arr[k] = R[j];
+            array[k] = R[j];
             j++;
         }
         k++;
@@ -38,131 +39,180 @@ void merge(int arr[], int l, int m, int r)
 
     while (i < N1)
     {
-        arr[k] = L[i];
+        array[k] = L[i];
         i++;
         k++;
     }
 
     while (j < N2)
     {
-        arr[k] = R[j];
+        array[k] = R[j];
         j++;
         k++;
     }
 }
 
-void mergeSort(int arr[], int l, int r)
-{
-    if (l < r)
-    {
-        int m = l + (r - l) / 2;
-
-        mergeSort(arr, l, m);
-        mergeSort(arr, m + 1, r);
-
-        merge(arr, l, m, r);
-    }
-}
-
-// Will implement insertion sort
-void insertionSort(int arr[], int t)
+// implement insertion sort
+// extraMemoryAllocation counts bytes of memory allocated
+void insertionSort(int array[], int n)
 {
     int i, key, j;
-    for (i = 1; i < t; i++)
+    for (i = 1; i < n; i++)
     {
-        key = arr[i];
+        key = array[i];
         j = i - 1;
 
-        while (j >= 0 && arr[j] > key)
+        while (j >= 0 && array[j] > key)
         {
-            arr[j + 1] = arr[j];
+            array[j + 1] = array[j];
             j = j - 1;
         }
-        arr[j + 1] = key;
+        array[j + 1] = key;
     }
 }
 
-// Will implement bubble sort
-void bubbleSort(int arr[], int t)
+// implement bubble sort
+// extraMemoryAllocation counts bytes of extra memory allocated
+void bubbleSort(int array[], int n)
 {
     int i, j;
-    for (i = 0; i < t - 1; i++)
+    for (i = 0; i < n - 1; i++)
     {
-        for (j = 0; j < t - i - 1; j++)
+        for (j = 0; j < n - i - 1; j++)
         {
-            if (arr[j] > arr[j + 1])
+            if (array[j] > array[j + 1])
             {
-                int temp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = temp;
+                int temp = array[j];
+                array[j] = array[j + 1];
+                array[j + 1] = temp;
             }
         }
     }
 }
 
 // implement selection sort
-void selectionSort(int arr[], int t)
+// extraMemoryAllocation counts bytes of extra memory allocated
+void selectionSort(int array[], int n)
 {
-    int i, j, min_idx;
-    for (i = 0; i < t - 1; i++)
+    int i, j, minimumIndex;
+    for (i = 0; i < n - 1; i++)
     {
-        min_idx = i;
-        for (j = i + 1; j < t; j++)
+        minimumIndex = i;
+        for (j = i + 1; j < n; j++)
         {
-            if (arr[j] < arr[min_idx])
-                min_idx = j;
+            if (array[j] < array[minimumIndex])
+                minimumIndex = j;
         }
-        int temp = arr[min_idx];
-        arr[min_idx] = arr[i];
-        arr[i] = temp;
+        int temp = array[minimumIndex];
+        array[minimumIndex] = array[i];
+        array[i] = temp;
         extraMemoryAllocation += 2 * sizeof(int);
     }
 }
 
-// parses the input file to an array
+void heapify(int array[], int n, int i)
+{
+    int largest = i;       // Initialize largest as root
+    int left = 2 * i + 1;  // left = 2*i + 1
+    int right = 2 * i + 2; // right = 2*i + 2
 
-// Will peint the last and first 100 arrays
+    if (left < n && array[left] > array[largest])
+        largest = left;
+
+    if (right < n && array[right] > array[largest])
+        largest = right;
+
+    if (largest != i)
+    {
+        int temp = array[i];
+        array[i] = array[largest];
+        array[largest] = temp;
+        heapify(array, n, largest); // Recursively heapify the affected sub-tree
+    }
+}
+
+// Implement heap sort
+void heapSort(int array[], int n)
+{
+    // Build heap (rearrange array)
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(array, n, i);
+
+    // One by one extract an element from heap
+    for (int i = n - 1; i > 0; i--)
+    {
+        // Move current root to end
+        int temp = array[0];
+        array[0] = array[i];
+        array[i] = temp;
+
+        // call max heapify on the reduced heap
+        heapify(array, i, 0);
+    }
+}
+
+void mergeSort(int array[], int left, int right)
+{
+    if (left < right)
+    {
+        int middle = left + (right - left) / 2;
+
+        mergeSort(array, left, middle);
+        mergeSort(array, middle + 1, right);
+
+        merge(array, left, middle, right);
+    }
+}
+
+// prints first and last 100 items in the data array
 
 int main()
 {
-    int t = 10000;
-    int arr[t];
+    int n = 10000;
+    int array[n];
     srand(time(0));
+    // initialize array with random values
+    for (int i = 0; i < n; i++)
+        array[i] = rand() % 100;
 
-    for (int i = 0; i < t; i++)
-        arr[i] = rand() % 100;
+    printf("------------------\n");
+    printf("Data size: 10000\n");
+    printf("------------------\n");
 
-    printf("---------------------------\n");
-    // printf("Dataset Size : %d\n",dataSz);
-    printf("---------------------------\n");
+    // heap sort
+    extraMemoryAllocation = 0;
+    clock_t timeToStart = clock();
+    heapSort(array, n);
+    printf("Heap sort: %.2fs\n", (double)(clock() - timeToStart) / CLOCKS_PER_SEC);
+    printf("Extra memory allocated: %d bytes\n", extraMemoryAllocation);
 
     // merge sort
     extraMemoryAllocation = 0;
-    clock_t timeStart = clock();
-    mergeSort(arr, 0, t - 1);
-    printf("Merge sort: %.2fs\t", (double)(clock() - timeStart) / CLOCKS_PER_SEC);
-    printf("Extra memory allocated: %d bytes\t", extraMemoryAllocation);
+    timeToStart = clock();
+    mergeSort(array, 0, n - 1);
+    printf("Merge sort: %.2fs\n", (double)(clock() - timeToStart) / CLOCKS_PER_SEC);
+    printf("Extra memory allocated: %d bytes\n", extraMemoryAllocation);
 
     // insertion sort
     extraMemoryAllocation = 0;
-    timeStart = clock();
-    insertionSort(arr, t);
-    printf("Insertion sort: %.2fs\t", (double)(clock() - timeStart) / CLOCKS_PER_SEC);
-    printf("Extra memory allocated: %d bytes\t", extraMemoryAllocation);
+    timeToStart = clock();
+    insertionSort(array, n);
+    printf("Insertion sort: %.2fs\n", (double)(clock() - timeToStart) / CLOCKS_PER_SEC);
+    printf("Extra memory allocated: %d bytes\n", extraMemoryAllocation);
 
     // bubble sort
     extraMemoryAllocation = 0;
-    timeStart = clock();
-    bubbleSort(arr, t);
-    printf("Bubble sort: %.2fs\t", (double)(clock() - timeStart) / CLOCKS_PER_SEC);
-    printf("Extra memory allocated: %d bytes\t", extraMemoryAllocation);
+    timeToStart = clock();
+    bubbleSort(array, n);
+    printf("Bubble sort: %.2fs\n", (double)(clock() - timeToStart) / CLOCKS_PER_SEC);
+    printf("Extra memory allocated: %d bytes\n", extraMemoryAllocation);
 
     // selection sort
     extraMemoryAllocation = 0;
-    timeStart = clock();
-    selectionSort(arr, t);
-    printf("Selection sort: %.2fs\t", (double)(clock() - timeStart) / CLOCKS_PER_SEC);
-    printf("Extra memory allocated: %d bytes\t", extraMemoryAllocation);
+    timeToStart = clock();
+    selectionSort(array, n);
+    printf("Selection sort: %.2fs\n", (double)(clock() - timeToStart) / CLOCKS_PER_SEC);
+    printf("Extra memory allocated: %d bytes\n", extraMemoryAllocation);
 
     return 0;
 }
